@@ -1,0 +1,120 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "id": "70aed33a",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Shortest paths from vertex 0:\n",
+      "  Vertex   Distance                           Path\n",
+      "-------------------------------------------------------\n",
+      "       0          0                              0\n",
+      "       1          4                         0 -> 1\n",
+      "       2          7                         0 -> 2\n",
+      "       3          2                         0 -> 3\n",
+      "       4          9                    0 -> 1 -> 4\n",
+      "       5          6                    0 -> 3 -> 5\n",
+      "       6         10                    0 -> 3 -> 6\n",
+      "       7         12               0 -> 3 -> 5 -> 7\n",
+      "       8         15               0 -> 3 -> 6 -> 8\n",
+      "       9          8               0 -> 3 -> 5 -> 9\n",
+      "      10         14         0 -> 3 -> 5 -> 9 -> 10\n"
+     ]
+    }
+   ],
+   "source": [
+    "import heapq\n",
+    " \n",
+    "def dijkstra(graph, source):\n",
+    "    \"\"\"\n",
+    "    Dijkstra's Algorithm using Min-Heap\n",
+    "    Time: O((V + E) log V), Space: O(V)\n",
+    "    graph: dict {u: [(v, weight), ...]}, 0-indexed\n",
+    "    \"\"\"\n",
+    "    n = len(graph)\n",
+    "    dist = [float('inf')] * n\n",
+    "    prev = [None] * n\n",
+    "    dist[source] = 0\n",
+    "    pq = [(0, source)]  # (distance, vertex)\n",
+    "    visited = set()\n",
+    " \n",
+    "    while pq:\n",
+    "        d, u = heapq.heappop(pq)\n",
+    "        if u in visited:\n",
+    "            continue\n",
+    "        visited.add(u)\n",
+    "        for v, w in graph[u]:\n",
+    "            if dist[u] + w < dist[v]:\n",
+    "                dist[v] = dist[u] + w\n",
+    "                prev[v] = u\n",
+    "                heapq.heappush(pq, (dist[v], v))\n",
+    " \n",
+    "    return dist, prev\n",
+    " \n",
+    "def reconstruct_path(prev, source, target):\n",
+    "    path = []\n",
+    "    node = target\n",
+    "    while node is not None:\n",
+    "        path.append(node)\n",
+    "        node = prev[node]\n",
+    "    path.reverse()\n",
+    "    if path[0] == source:\n",
+    "        return path\n",
+    "    return []\n",
+    " \n",
+    "# --- Graph Definition (Adjacency List) ---\n",
+    "graph = {\n",
+    "    0: [(1, 4), (2, 7), (3, 2)],\n",
+    "    1: [(4, 5), (5, 3)],\n",
+    "    2: [(4, 2), (6, 6)],\n",
+    "    3: [(5, 4), (6, 8)],\n",
+    "    4: [(7, 3), (8, 7)],\n",
+    "    5: [(7, 6), (9, 2)],\n",
+    "    6: [(8, 5), (9, 4)],\n",
+    "    7: [(10, 5)],\n",
+    "    8: [(10, 3)],\n",
+    "    9: [(10, 6)],\n",
+    "    10: []\n",
+    "}\n",
+    " \n",
+    "source = 0\n",
+    "dist, prev = dijkstra(graph, source)\n",
+    " \n",
+    "print(f'Shortest paths from vertex {source}:')\n",
+    "print(f'{\"Vertex\":>8} {\"Distance\":>10} {\"Path\":>30}')\n",
+    "print('-' * 55)\n",
+    "for v in range(len(graph)):\n",
+    "    path = reconstruct_path(prev, source, v)\n",
+    "    path_str = ' -> '.join(map(str, path)) if path else 'No path'\n",
+    "    d = dist[v] if dist[v] != float('inf') else 'INF'\n",
+    "    print(f'{v:>8} {str(d):>10} {path_str:>30}')"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": ".venv",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.14.0"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
